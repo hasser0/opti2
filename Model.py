@@ -1,4 +1,5 @@
 from scipy.optimize import linprog
+from scipy.optimize import OptimizeResult
 
 class Model:
     def __init__(self):
@@ -11,9 +12,10 @@ class Model:
         self.b_le = None
         self.b_eq = None
         self.c = None
+        self.integer = None
 
-    def update(self):
-        pass
+    def iteration(self, result):
+        print("hola")
 
     def solve(self):
         return linprog(c=self.c,
@@ -21,5 +23,5 @@ class Model:
                 A_eq=self.A_eq,
                 b_ub=self.b_le,
                 b_eq=self.b_eq,
-                callback=self.update,
+                callback=self.iteration,
                 method='revised simplex')
