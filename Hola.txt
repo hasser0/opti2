@@ -1,5 +1,0 @@
-otra prueba para git
-
-*haré este cambio para verificar el funcionamiento del comando git log y ver el historial de cambios en el documento 
-
-tenemos que echarle ganas a esto xd 
