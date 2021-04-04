@@ -9,32 +9,38 @@ class IP:
         self.relaxed_LP = relaxed_LP
         self.int_vars = int_vars
 
-    def integer_satisfied(self, LP):
+    def int_rest_satisfied(self, LP):
         """
         a => b  === a&b or !a
         :param LP: an Linear Programming
         :return: boolean np.array integer restrictions satisfied in LP solution
         """
-        return (self.int_vars & LP.is_integer) | np.logical_not(self.int_vars)
+        return (self.int_vars & LP.are_int_vars) | np.logical_not(self.int_vars)
 
-    def all_integer_satisfied(self, LP):
+    def all_int_rest_satisfied(self, LP):
         """
         :param LP: linear programming
         :return: Are all integer restrictions satisfied
         """
-        return np.all(self.integer_satisfied(LP))
+        return np.all(self.int_rest_satisfied(LP))
 
     def branch(self, LP):
-        int_sat = self.integer_satisfied(LP)
-        solution = LP.solution
-        index_branch = np.argwhere(int_sat == False)[0][0]
-        value_branch = solution[index_branch]
-        lower_rest = np.zeros(solution.shape[0])
+        """
+        lower: branch from below
+        upper: branch from above
+        :param LP:
+        :return:
+        """
+        int_rest_satisfied = self.int_rest_satisfied(LP)
+        x_solution = LP.x_solution_values
+        index_branch = np.argwhere(int_rest_satisfied == False)[0][0]
+        x_branch_value = x_solution[index_branch]
+        lower_rest = np.zeros(x_solution.shape[0])
         lower_rest[index_branch] = 1
-        upper_rest = np.zeros(solution.shape[0])
+        upper_rest = np.zeros(x_solution.shape[0])
         upper_rest[index_branch] = 1
-        lower_LP = LP.add_restriction(lower_rest, "<=", np.floor(value_branch))
-        upper_LP = LP.add_restriction(upper_rest, ">=", np.ceil(value_branch))
+        lower_LP = LP.add_restriction(lower_rest, "<=", np.floor(x_branch_value))
+        upper_LP = LP.add_restriction(upper_rest, ">=", np.ceil(x_branch_value))
         return lower_LP, upper_LP
 
     def solve(self, method = "branch bound"):
@@ -45,28 +51,29 @@ class IP:
         """
         :return: Either an OptimizedResult or None
         """
-        solution = None
+        SUCCESSFUL = 0
+        better_solution = None
         iteration = 1
-        z_value = np.inf
-        stack = []
-        stack.append(self.relaxed_LP)
-        while stack:
-            cur_LP = stack.pop()
-            cur_sol = cur_LP.solveLP()  #OptimizeResult
-            cur_z = cur_sol.fun #z_value of current LP solution
+        better_z_value = np.inf
+        LP_stack = []
+        LP_stack.append(self.relaxed_LP)
+        while LP_stack:
+            current_LP = LP_stack.pop()
+            current_sol = current_LP.solve()
+            current_z = current_sol.fun
             print(iteration)
-            print(cur_sol)
-            iteration+=1
-            if cur_sol.status != 0:
+            print(current_sol)
+            iteration += 1
+            if not current_sol.status == SUCCESSFUL:
                 continue
-            if cur_z >= z_value:
+            if current_z >= better_z_value:
                 continue
-            if not self.all_integer_satisfied(cur_LP):
-                lower_LP, upper_LP = self.branch(cur_LP)
-                stack.append(lower_LP)
-                stack.append(upper_LP)
+            if not self.all_int_rest_satisfied(current_LP):
+                lower_LP, upper_LP = self.branch(current_LP)
+                LP_stack.append(lower_LP)
+                LP_stack.append(upper_LP)
                 continue
-            solution = cur_sol
-            z_value = cur_z
+            better_solution = current_sol
+            better_z_value = current_z
         print("")
-        return solution
+        return better_solution
