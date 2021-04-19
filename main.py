@@ -1,7 +1,6 @@
 from Model import Model
 from IntegerProgramming import IP
 import numpy as np
-import timeit
 
 def main():
     A = np.array([

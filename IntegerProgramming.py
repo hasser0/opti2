@@ -68,7 +68,7 @@ class IP:
         upper_LP = LP.add_restriction(upper_rest, ">=", np.ceil(x_branch_value))
         return lower_LP, upper_LP
 
-    def solve(self, method = "branch bound"):
+    def solve(self, method="cutting plane"):
         if method == "branch bound":
             return self.branch_bound()
         elif method == "cutting plane":
@@ -78,6 +78,7 @@ class IP:
         """
         :return: Either an OptimizedResult or None
         """
+        iteration = 1
         SUCCESSFUL = 0
         better_solution = None
         better_z_value = np.inf
@@ -87,6 +88,9 @@ class IP:
             current_LP = LP_stack.pop()
             current_sol = current_LP.solve()
             current_z = current_sol.fun
+            #print(iteration)
+            #print(current_sol)
+            iteration +=1
             if not current_sol.status == SUCCESSFUL:
                 continue
             if current_z >= better_z_value:
@@ -109,6 +113,7 @@ class IP:
         F|F|    F
         :return:
         """
+        total_vars = self.int_vars.shape[0]
         SUCCESFULL = 0
         cutted_LP = copy.deepcopy(self.relaxed_LP)
         int_vars = copy.deepcopy(self.int_vars)
