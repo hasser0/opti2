@@ -18,5 +18,22 @@ def main():
     #print(ip.solve("cutting plane").x)
     print(ip.solve("branch bound").x)
 
+
+
+from BFS_methods import northwest_corner, minium_cost, voguels
+
+def test():
+    s=np.array([10, 15])
+    d=np.array([15, 5, 5])
+    c=np.array([
+        [6, 7, 8],
+        [15, 80, 78]
+    ])
+    np.array([
+        [0, 5, 5],
+        [15, 0, 0]
+    ])
+    print(voguels(s,d,c))
+
 if __name__ == "__main__":
-    main()
+    test()
