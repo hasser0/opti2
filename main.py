@@ -1,6 +1,7 @@
 from Model import Model
 from IntegerProgramming import IP
 import numpy as np
+from BFS_methods import northwest_corner, minium_cost, voguels
 
 def main():
     A = np.array([
@@ -18,20 +19,18 @@ def main():
     #print(ip.solve("cutting plane").x)
     print(ip.solve("branch bound").x)
 
-
-
-from BFS_methods import northwest_corner, minium_cost, voguels
-
 def test():
-    s=np.array([10, 15])
-    d=np.array([15, 5, 5])
-    c=np.array([
-        [6, 7, 8],
-        [15, 80, 78]
+    s = np.array([1000, 1500, 750])
+    d = np.array([2000, 500, 400, 10, 100, 240])
+    c = np.array([
+        [3, 20, 25, 75, 45, 0],
+        [20, 15, 2, 50, 80, 0],
+        [15, 2, 10, 40, 60, 0]
     ])
-    np.array([
-        [0, 5, 5],
-        [15, 0, 0]
+    e = np.array([
+        [1000, 0, 0, 0, 0, 0],
+        [1000, 0, 400, 0, 0, 100],
+        [0, 500, 0, 10, 100, 140]
     ])
     print(voguels(s,d,c))
 
