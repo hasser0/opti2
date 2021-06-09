@@ -1,5 +1,5 @@
 import pytest
-from BFS_methods import northwest_corner, minium_cost, voguels
+from BFS_methods import northwest_corner, minium_cost, vogels
 import numpy as np
 
 @pytest.mark.parametrize(
@@ -92,4 +92,4 @@ def test_minium_cost_method(supply, demand, cost, expected):
     ]
 )
 def test_vogels(supply, demand, cost, expected):
-    assert np.allclose(voguels(supply, demand, cost)[0], expected)
+    assert np.allclose(vogels(supply, demand, cost)[0], expected)
