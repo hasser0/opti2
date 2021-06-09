@@ -3,37 +3,41 @@ def northwest_corner(supply, demand):
     demand = demand.flatten()
     supply = supply.flatten()
     if np.sum(supply) != np.sum(demand):
-        return
-    i, j = 0 , 0
+        raise ValueError('Supply and demand must equals')
+    i, j = 0, 0
+    BFS = []
     m = supply.size
     n = demand.size
-    tableau = np.zeros((m,n))
+    tableau = np.zeros((m, n))
     while i < m and j < n:
         tableau[i, j] = np.min([supply[i], demand[j]])
+        BFS.append((i, j))
         supply[i] -= tableau[i, j]
         demand[j] -= tableau[i, j]
         if demand[j] == 0:
             j += 1
             continue
         i += 1
-    return tableau
+    return tableau, BFS
 
 def minium_cost(supply, demand, cost):
     demand = demand.flatten()
     supply = supply.flatten()
     if np.sum(supply) != np.sum(demand):
-        return
+        raise ValueError('Supply and demand must equals')
+    BFS = []
     tableau = np.zeros((supply.size, demand.size))
     while not (supply == 0).all() and not (demand == 0).all():
         entry_row, entry_col = np.unravel_index(cost.argmin(), cost.shape)
         cost[entry_row, entry_col] = np.iinfo(np.int16).max
         entry_value = min(supply[entry_row], demand[entry_col])
         tableau[entry_row, entry_col] = entry_value
+        BFS.append((entry_row,entry_col))
         supply[entry_row] -= entry_value
         demand[entry_col] -= entry_value
-    return tableau
+    return tableau, BFS
 
-def voguels(supply, demand, cost):
+def vogels(supply, demand, cost):
     def calc_penalty(vector):
         sorted = np.sort(vector)
         sorted = sorted[sorted > 0]
@@ -41,11 +45,11 @@ def voguels(supply, demand, cost):
             return 0
         min1, min2 = sorted[[0, 1]]
         return min2-min1
-
+    BFS = []
     demand = demand.flatten()
     supply = supply.flatten()
     if np.sum(supply) != np.sum(demand):
-        return
+        raise ValueError('Supply and demand must equals')
     tableau = np.zeros((supply.size, demand.size))
     supply_penalty = np.array([calc_penalty(row) for row in cost])
     demand_penalty = np.array([calc_penalty(col) for col in cost.T])
@@ -62,8 +66,10 @@ def voguels(supply, demand, cost):
             entry_row = valid_index[col[valid_index].argmin()]
         entry_value = min(supply[entry_row], demand[entry_col])
         tableau[entry_row, entry_col] = entry_value
+        BFS.append((entry_row, entry_col))
         supply[entry_row] -= entry_value
         demand[entry_col] -= entry_value
+        BFS.append((entry_row, entry_col))
         cost[entry_row, entry_col] = -1
         if supply[entry_row] == 0:
             supply_penalty[entry_row] = -1
@@ -77,4 +83,4 @@ def voguels(supply, demand, cost):
                 if supply_penalty[index] == -1:
                     continue
                 supply_penalty[index] = calc_penalty(row[demand_penalty != -1])
-    return tableau
+    return tableau, BFS

@@ -35,7 +35,7 @@ import numpy as np
     ]
 )
 def test_northwest_method(supply, demand, expected):
-    assert np.allclose(northwest_corner(supply, demand), expected)
+    assert np.allclose(northwest_corner(supply, demand)[0], expected)
 
 
 @pytest.mark.parametrize(
@@ -58,7 +58,7 @@ def test_northwest_method(supply, demand, expected):
     ]
 )
 def test_minium_cost_method(supply, demand, cost, expected):
-    assert np.allclose(minium_cost(supply, demand, cost), expected)
+    assert np.allclose(minium_cost(supply, demand, cost)[0], expected)
 
 @pytest.mark.parametrize(
     "supply, demand, cost, expected",
@@ -91,5 +91,5 @@ def test_minium_cost_method(supply, demand, cost, expected):
         )
     ]
 )
-def test_voguels(supply, demand, cost, expected):
-    assert np.allclose(voguels(supply, demand, cost), expected)
+def test_vogels(supply, demand, cost, expected):
+    assert np.allclose(voguels(supply, demand, cost)[0], expected)
