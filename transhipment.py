@@ -86,6 +86,7 @@ if __name__ == '__main__':
     ])
     supply = np.array([35,50,40])
     demand = np.array([45,20,30,30])
+    print(transhipment_simplex(cost,supply,demand))
 
 
 

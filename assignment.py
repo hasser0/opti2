@@ -11,7 +11,7 @@ def crossed_rows_columns(zeros_row,zeros_col,cross):
         r_max = zeros_row[r_max_index]
         c_max_index = zeros_col.argmax()
         c_max = zeros_col[c_max_index]
-        if r_max > c_max:
+        if r_max >= c_max:
             cross[r_max_index,:] = 0
             x_rows[r_max_index] = True
         else:
@@ -23,27 +23,33 @@ def crossed_rows_columns(zeros_row,zeros_col,cross):
     return x_rows, x_cols, crossed
 
 def hungarian_method(cost):
-    min_row = cost.min(axis=1).reshape(4,1)
+    size = cost.shape[0]
+    min_row = cost.min(axis=1).reshape(size,1)
     cost = cost - min_row
     min_col = cost.min(axis=0)
     cost = cost - min_col
-    cross = (cost == 0).astype(int)
-    size = cross.shape[0]
-    zeros_col = cross.sum(axis=0)
-    zeros_row = cross.sum(axis=1)
     ones = np.ones(size)
     while True:
         cross = (cost == 0).astype(int)
+        zeros_col = cross.sum(axis=0)
+        zeros_row = cross.sum(axis=1)
         x_rows, x_cols, crossed = crossed_rows_columns(zeros_row, zeros_col, cross)
-        cross = (cost == 0).astype(int)
         if crossed == size:
+            cross = (cost == 0).astype(int)
             return cross
         nx_rows, nx_cols = np.logical_not(x_rows), np.logical_not(x_cols)
-        k = cost[nx_rows & nx_cols.reshape(-1, 1)].min()
-        cost[nx_rows & nx_cols.reshape(-1, 1)] -= 1
-        cost[x_rows & x_cols.reshape(-1, 1)] += 1
+        reduced_matrix = nx_cols & nx_rows.reshape(-1, 1)
+        cover_twice_matrix = x_cols & x_rows.reshape(-1,1)
+        k = cost[reduced_matrix].min()
+        cost[reduced_matrix] -= 1
+        cost[cover_twice_matrix] += 1
 
 if __name__ == '__main__':
-    cost = np.array([14, 5, 8, 7, 2, 12, 6, 5,
-                     7, 8, 3, 9, 2, 4, 6, 10]).reshape(4, 4)
+    cost = np.array([
+        [47, 50, 57, 57, 0],
+        [48, 52, 52, 62, 0],
+        [50, 55, 54, 59, 0],
+        [52, 54, 55, 60, 0],
+        [51, 51, 53, 58, 0]
+    ])
     print(hungarian_method(cost))
