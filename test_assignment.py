@@ -1,6 +1,21 @@
 import numpy as np
 import pytest
 from assignment import hungarian_method
+from transhipment import transhipment_simplex
+@pytest.mark.test_assignment_transhipment
+def test_assignment_transhipment():
+    t = []
+    h = []
+    c = []
+    for i in range(50):
+        size = np.random.randint(low=3, high=6, size=1)[0]
+        cost = np.random.randint(0, 50, size = size*size).reshape(size, size)
+        c.append(cost)
+        supply = np.ones(size)
+        demand = np.ones(size)
+        t.append(transhipment_simplex(cost, supply, demand))
+        h.append(hungarian_method(cost))
+    print([True if np.all(tran-hun<=0) else False for hun,tran in zip(h,t)])
 
 @pytest.mark.parametrize(
     "cost, expected",
